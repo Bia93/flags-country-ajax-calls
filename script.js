@@ -44,9 +44,9 @@ const countriesContainer = document.querySelector(".countries");
 const renderCountry = function (data, className = "") {
   //pt a scrie tara vecina
   const html = `  <article class="country ${className}">
-  <img class="country__img" src="${data.flags[1]}" />
+  <img class="country__img" src="" />
   <div class="country__data">
-    <h3 class="country__name">${data.altSpellings[2]}</h3>
+    <h3 class="country__name">${data.altSpellings}</h3>
     <h4 class="country__region">${data.capital}</h4>
     <p class="country__row"><span>👫</span>${(
       +data.population / 100000
@@ -101,21 +101,28 @@ getCountryandNeighbour("romania"); //AJAX CALLS
 // in loc de ce mai sus( face parte din script.js), scriem cu promises
 
 const getCountryData = function (country) {
-  //1. calling the fetch will immediatly return a promise; in the beginning the prmoise is still pending because the asychronous task of getting the data, is still running in the background
+  //1. calling the fetch will immediately return a promise; in the beginning the promise is still pending because the asychronous task of getting the data, is still running in the background
+  //1.country one
   fetch(`https://restcountries.com/v3/name/${country}`)
     .then(function (
-      //2.we use THEN method for handling the fulfilled state,its  avaible in all promises
+      //2.we use THEN method for handling the fulfilled state,its  available in all promises
       response
     ) {
       console.log(response);
       return response.json();
     })
     .then(function (data) {
-      console.log(data);
       renderCountry(data[0]);
-    });
+      console.log(data);
+
+      //country 2
+      const neighbour = data[0].borders[0];
+      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+    })
+    .then((response) => response.json())
+    .then((data) => renderCountry(data[0], "neighbour"));
 };
-getCountryData("portugal");
+getCountryData("usa");
 //3.the argument from the callbackfunction of then, as the resulting value of the fulfilled promises
 //4.to be able to read the data from body: ReadableStream we need to call the json method on the response
 //the json method from the response.json()- is a method that is available
